@@ -7,6 +7,8 @@ All notable changes to the library will be documented in this file.
 - Add `codePoints`, `maxCodePoints`, `minCodePoints` and `notCodePoints` validation actions to validate the number of Unicode code points (pull request #888)
 - Add `ksuid` validation action to validate KSUIDs (pull request #1370)
 - Fix `stringifyJson` action to preserve the dataset value when `JSON.stringify` returns `undefined` (pull request #1476)
+- Fix `strictObject` and `strictObjectAsync` to reject unknown input keys that collide with `Object.prototype` members like `toString` instead of accepting them silently (pull request #1523)
+- Fix `looseObject`, `looseObjectAsync`, `objectWithRest` and `objectWithRestAsync` to pass through or apply `rest` to input keys that collide with `Object.prototype` members instead of skipping them (pull request #1523)
 
 ## v1.4.2 (June 28, 2026)
 

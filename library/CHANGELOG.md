@@ -9,6 +9,7 @@ All notable changes to the library will be documented in this file.
 - Fix `stringifyJson` action to preserve the dataset value when `JSON.stringify` returns `undefined` (pull request #1476)
 - Fix `strictObject` and `strictObjectAsync` to reject unknown input keys that collide with `Object.prototype` members like `toString` instead of accepting them silently (pull request #1523)
 - Fix `looseObject`, `looseObjectAsync`, `objectWithRest` and `objectWithRestAsync` to pass through or apply `rest` to input keys that collide with `Object.prototype` members instead of skipping them (pull request #1523)
+- Fix `object`, `objectAsync`, `strictObject`, `strictObjectAsync`, `looseObject`, `looseObjectAsync`, `objectWithRest` and `objectWithRestAsync` to treat an entry named like an `Object.prototype` member as missing when the input only inherits that key, so a required entry reports a missing key and an optional entry applies its default instead of validating the inherited value (pull request #1523)
 
 ## v1.4.2 (June 28, 2026)
 

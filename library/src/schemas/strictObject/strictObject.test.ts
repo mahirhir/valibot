@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+﻿import { describe, expect, test } from 'vitest';
 import { fallback } from '../../methods/index.ts';
 import type { FailureDataset, InferIssue } from '../../types/index.ts';
 import { expectNoSchemaIssue, expectSchemaIssue } from '../../vitest/index.ts';
@@ -734,6 +734,52 @@ describe('strictObject', () => {
           },
         ],
       } satisfies FailureDataset<InferIssue<typeof schema>>);
+    });
+  });
+  describe('should treat prototype member names as missing keys', () => {
+    const baseInfo = {
+      message: expect.any(String),
+      requirement: undefined,
+      issues: undefined,
+      lang: undefined,
+      abortEarly: undefined,
+      abortPipeEarly: undefined,
+    };
+
+    test('for a required entry named like an object prototype member', () => {
+      const schema = strictObject({ toString: string() });
+      const input = {};
+      expect(schema['~run']({ value: input }, {})).toStrictEqual({
+        typed: false,
+        value: {},
+        issues: [
+          {
+            ...baseInfo,
+            kind: 'schema',
+            type: 'strict_object',
+            input: undefined,
+            expected: '"toString"',
+            received: 'undefined',
+            path: [
+              {
+                type: 'object',
+                origin: 'key',
+                input,
+                key: 'toString',
+                value: undefined,
+              },
+            ],
+          },
+        ],
+      } satisfies FailureDataset<InferIssue<typeof schema>>);
+    });
+
+    test('for an optional entry with a default named like an object prototype member', () => {
+      const schema = strictObject({ toString: optional(string(), 'foo') });
+      expect(schema['~run']({ value: {} }, {})).toStrictEqual({
+        typed: true,
+        value: { toString: 'foo' },
+      });
     });
   });
 });

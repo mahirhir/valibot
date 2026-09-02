@@ -1,4 +1,4 @@
-import { getDefault } from '../../methods/getDefault/index.ts';
+﻿import { getDefault } from '../../methods/getDefault/index.ts';
 import { getFallback } from '../../methods/getFallback/index.ts';
 import type {
   BaseSchemaAsync,
@@ -115,19 +115,22 @@ export function objectAsync(
         // parse input of key or default value asynchronously
         const valueDatasets = await Promise.all(
           Object.entries(this.entries).map(async ([key, valueSchema]) => {
+            const isKeyPresent = Object.prototype.hasOwnProperty.call(
+              input,
+              key
+            );
             if (
-              key in input ||
+              isKeyPresent ||
               ((valueSchema.type === 'exact_optional' ||
                 valueSchema.type === 'optional' ||
                 valueSchema.type === 'nullish') &&
                 // @ts-expect-error
                 valueSchema.default !== undefined)
             ) {
-              const value: unknown =
-                key in input
-                  ? // @ts-expect-error
-                    input[key]
-                  : await getDefault(valueSchema);
+              const value: unknown = isKeyPresent
+                ? // @ts-expect-error
+                  input[key]
+                : await getDefault(valueSchema);
               return [
                 key,
                 value,
@@ -135,13 +138,7 @@ export function objectAsync(
                 await valueSchema['~run']({ value }, config),
               ] as const;
             }
-            return [
-              key,
-              // @ts-expect-error
-              input[key] as unknown,
-              valueSchema,
-              null,
-            ] as const;
+            return [key, undefined, valueSchema, null] as const;
           })
         );
 

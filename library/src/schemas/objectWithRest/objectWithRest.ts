@@ -1,4 +1,4 @@
-import { getDefault } from '../../methods/getDefault/index.ts';
+﻿import { getDefault } from '../../methods/getDefault/index.ts';
 import { getFallback } from '../../methods/getFallback/index.ts';
 import type {
   BaseIssue,
@@ -131,21 +131,22 @@ export function objectWithRest(
         for (const key in this.entries) {
           const valueSchema = this.entries[key];
 
+          const isKeyPresent = Object.prototype.hasOwnProperty.call(input, key);
+
           // If key is present or its an optional schema with a default value,
           // parse input of key or default value
           if (
-            key in input ||
+            isKeyPresent ||
             ((valueSchema.type === 'exact_optional' ||
               valueSchema.type === 'optional' ||
               valueSchema.type === 'nullish') &&
               // @ts-expect-error
               valueSchema.default !== undefined)
           ) {
-            const value: unknown =
-              key in input
-                ? // @ts-expect-error
-                  input[key]
-                : getDefault(valueSchema);
+            const value: unknown = isKeyPresent
+              ? // @ts-expect-error
+                input[key]
+              : getDefault(valueSchema);
             const valueDataset = valueSchema['~run']({ value }, config);
 
             // If there are issues, capture them
@@ -212,8 +213,7 @@ export function objectWithRest(
                   origin: 'key',
                   input: input as Record<string, unknown>,
                   key,
-                  // @ts-expect-error
-                  value: input[key],
+                  value: undefined,
                 },
               ],
             });
